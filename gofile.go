@@ -199,8 +199,9 @@ func startClient(host string, port int) {
 		if len(r.Result) > 0 && r.Success {
 			if cmd.Command == GET {
 				writeFileClient(&r)
+			} else {
+				fmt.Println(string(r.Result))
 			}
-			fmt.Println(string(r.Result))
 		} else if !r.Success {
 			fmt.Println(r.ErrorDescription)
 		}
