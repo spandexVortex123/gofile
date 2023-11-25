@@ -76,7 +76,6 @@ func handleConnection(conn net.Conn) {
 			fmt.Println("[-] Error reading command")
 			fmt.Println(err)
 			closeCount += 1
-			// send error message
 		}
 
 		if closeCount == 10 {
@@ -87,23 +86,11 @@ func handleConnection(conn net.Conn) {
 			break
 		}
 
-		// fmt.Println("Server", cmd, err)
-
 		var res resultJson
 
 		c := strings.ToLower(strings.TrimSpace(cmd.Command))
 
 		runCommand(c, cmd.Args, &res)
-
-		// send response back
-		// res.Success = true
-		// res.Result = []byte("Hello world")
-
-		// _, jsonErr := json.Marshal(res)
-
-		// if jsonErr != nil {
-		// 	fmt.Println("[-] Error Marshalling Resposne Data")
-		// }
 
 		encoder := json.NewEncoder(conn)
 
@@ -121,21 +108,10 @@ func handleConnection(conn net.Conn) {
 
 	conn.Close()
 
-	// time.Sleep(2 * time.Second)
-	// fmt.Println("Server", jsonData)
-	// fmt.Println("server", string(jsonData))
-	// numberOfBytesWritten, writeErr := conn.Write(jsonData)
-
-	// if writeErr != nil {
-	// 	fmt.Println("[-] Error writting. ", writeErr)
-	// } else {
-	// 	fmt.Printf("[+] Wrote %d bytes\n", numberOfBytesWritten)
-	// }
-
 }
 
 func startServer(port int) {
-	// fmt.Println("Server main")
+
 	address := fmt.Sprintf("0.0.0.0:%d", port)
 	server, err := net.Listen(CONNECTION_TYPE, address)
 	if err != nil {
@@ -171,8 +147,6 @@ func startClient(host string, port int) {
 	}
 	defer conn.Close()
 
-	// var isClosed bool = false
-
 	for {
 
 		// get command from user
@@ -184,7 +158,6 @@ func startClient(host string, port int) {
 		}
 
 		clist := strings.Split(c, " ")
-		// fmt.Println(clist)
 
 		// convert to json
 		var cmd commandJson
@@ -196,16 +169,6 @@ func startClient(host string, port int) {
 		if cmd.Command == EXIT {
 			cmd.Closed = true
 		}
-
-		// fmt.Println("cmd in struct", cmd)
-
-		// _, cmdErr := json.Marshal(cmd)
-
-		// if cmdErr != nil {
-		// 	fmt.Println("[!] Error. Error Converting to JSON")
-		// 	fmt.Println(cmdErr)
-		// 	os.Exit(1)
-		// }
 
 		// write to socket
 		encoder := json.NewEncoder(conn)
@@ -226,19 +189,13 @@ func startClient(host string, port int) {
 		var r resultJson
 
 		d := json.NewDecoder(conn)
-
-		// fmt.Println("client", d)
 		rj := d.Decode(&r)
-
-		// fmt.Println("errrrrrr", rj)
 
 		if rj != nil {
 			fmt.Println("[-] Error. Error decoding data")
 			fmt.Println(rj)
 		}
 
-		// fmt.Println("response message")
-		// fmt.Println(r.Success)
 		if len(r.Result) > 0 && r.Success {
 			if cmd.Command == GET {
 				writeFileClient(&r)
@@ -247,7 +204,6 @@ func startClient(host string, port int) {
 		} else if !r.Success {
 			fmt.Println(r.ErrorDescription)
 		}
-		// fmt.Println([]byte(r.ErrorDescription))
 	}
 
 }
