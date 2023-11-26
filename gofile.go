@@ -189,22 +189,23 @@ func startClient(host string, port int) {
 		var r resultJson
 
 		d := json.NewDecoder(conn)
-		rj := d.Decode(&r)
+		decodeErr := d.Decode(&r)
 
-		if rj != nil {
+		if decodeErr != nil {
 			fmt.Println("[-] Error. Error decoding data")
-			fmt.Println(rj)
+			fmt.Println(decodeErr)
+		} else {
+			if len(r.Result) > 0 && r.Success {
+				if cmd.Command == GET {
+					writeFileClient(&r)
+				} else {
+					fmt.Println(string(r.Result))
+				}
+			} else if !r.Success {
+				fmt.Println(r.ErrorDescription)
+			}
 		}
 
-		if len(r.Result) > 0 && r.Success {
-			if cmd.Command == GET {
-				writeFileClient(&r)
-			} else {
-				fmt.Println(string(r.Result))
-			}
-		} else if !r.Success {
-			fmt.Println(r.ErrorDescription)
-		}
 	}
 
 }
@@ -339,6 +340,7 @@ func readFileByFileName(c string, args []string, res *resultJson) {
 	if c == GET {
 		res.FileName = args[0]
 	}
+	filePtr.Close()
 }
 
 func getFilesBasedOnDirectoryName(directoryName string, res *resultJson) {
