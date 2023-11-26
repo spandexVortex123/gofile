@@ -110,9 +110,9 @@ func handleConnection(conn net.Conn) {
 
 }
 
-func startServer(port int) {
+func startServer(port int, lhost string) {
 
-	address := fmt.Sprintf("0.0.0.0:%d", port)
+	address := fmt.Sprintf("%s:%d", lhost, port)
 	server, err := net.Listen(CONNECTION_TYPE, address)
 	if err != nil {
 		fmt.Println("[-] Error starting server. Exitting..")
@@ -381,6 +381,7 @@ func getFilesBasedOnDirectoryName(directoryName string, res *resultJson) {
 func main() {
 
 	stype := flag.String("stype", "none", "Server/Client")
+	lhost := flag.String("lhost", "0.0.0.0", "IP Address To Listen (Will Listen on All Interfaces By Default)")
 	lport := flag.Int("lport", -1, "Port for Server to Listen")
 	shost := flag.String("shost", "none", "IP Address of the Server to Connect To")
 	sport := flag.Int("sport", -1, "Server Port To Connect")
@@ -392,7 +393,7 @@ func main() {
 			usage()
 			os.Exit(1)
 		}
-		startServer(*lport)
+		startServer(*lport, *lhost)
 	} else if *stype == CLIENT {
 		if *shost == NONE {
 			fmt.Println("[-] Error. Need Server Address To Connect")
